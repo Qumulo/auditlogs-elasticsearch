@@ -1,0 +1,122 @@
+# Configuration file for Logstash
+# Logstash is using in conjunction with Filebeat in order to store
+# Qumulo Audit Logs in Elasticsearch
+
+# Filebeat (beats) will send us the data on port 10514
+
+input {
+  beats {
+    port => 10514
+  }
+}
+
+# All of the filter specifications...
+
+filter {
+
+# The data is coming from Filebeat via rsyslog in comma delimited format
+
+  csv {
+    separator => ","
+    skip_header => true
+    columns => ["qumulo-timestamp", "nodename", "ipaddress", "loginid", "protocol",
+      "operation", "status", "fileid", "filepath", "secondarypath"]
+
+# The fileid is an integer and the qumulo-timestamp is a date_time. If we didn't do
+# this, the default would be string and that would be hard to search with Elasticsearch
+
+    convert => {
+      "fileid" => "integer"
+      "qumulo-timestamp" => "date_time"
+    }
+  }
+
+# Copy the filepath and nodename to their destination variables so that we can
+# modify them through filters a little later.
+
+  mutate {
+    copy => { "filepath" => "primarypath" }
+  }
+
+  mutate {
+    copy => { "nodename" => "clustername" }
+  }
+
+# The Qumulo is sending via rsyslog the nodename. This is always in a format of CLUSTERNAME-NUMERIC,
+# where the numeric is the node id of the node sending us the event log.
+#
+# Since we want to find out the clustername, we will strip the "-NUMERIC" from the CLUSTERNAME
+
+  mutate {
+    gsub => [
+      "clustername", "(.*)?\-[0-9]*$", "\1"
+    ]
+  }
+
+# Find out if there is a suffix on the filepath. It is very likely that there may not be.
+# If there isn't, the following statement will cause an exception called "_grokparsefailure".
+# We will deal with that next...
+
+  grok {
+    match => ["filepath", "\.(?<extension>[^.]+)$"]
+  }
+
+# If we got an exception from the previous filter, then set the extension to nil.
+
+  if "_grokparsefailure" in [tags] {
+    ruby {
+      code => "event.set('extension', nil)"
+    }
+
+    mutate {
+      remove_tag => ["_grokparsefailure"]
+    }
+  }
+
+# It is possible that there might have been an extension with the format of ".jpg/".
+# Since we are stripping the suffix from the end of the filepath, it is possible that
+# this had an "/" at the end. Whenever, we have a "/" at the end of the filepath, this
+# indicates that we were dealing with a directory. That means that you had a directory
+# that was funny looking like "fubar.jpg". This is valid, but VERY confusing. So, if
+# the extension ended with a "/", then this was a directory and we will set the extension to nil.
+
+  if [extension] =~ /\/$/ {
+    ruby {
+      code => "event.set('extension', nil)"
+    }
+  }
+
+# It is possible that we got an extension from the filepath because somebody mapped
+# a drive using SMB. This would mean that we got a filepath like "\\groot.eng.qumulo.com\m-rs1".
+# This is clearly a share that was mapped. But, since we are looking for a suffix where the
+# "." is near the end of the string, the extension ended up being ".com\m-rs1".
+# So, find out if the filepath started with "\\" and make the extension into a nil.
+
+  if [primarypath] =~ /^(\\)(\\)/ {
+    ruby {
+      code => "event.set('extension', nil)"
+    }
+  }
+
+# Remove fields created by logstash (during filtering) and filebeat
+
+  mutate {
+    remove_field => ["host", "port", "message", "@version", "filepath"]
+    remove_field => ["input", "log", "tags", "agent", "ecs"]
+  }
+}
+
+# Output the result to Elasticsearch. Also, tell Elasticsearch to use the index "qumulo-auditlogs"
+# and that they can load the index template from the path specified.
+
+output {
+  elasticsearch {
+    hosts => ["elasticsearch:9200"]
+    user => "qumulo"
+    password => "changeme"
+    index => "qumulo-auditlogs"
+    manage_template => true
+    template_name => "qumulo-template"
+    template => "/usr/share/logstash/config/qumulo-template.json"
+  }
+}

@@ -1,0 +1,17 @@
+# https://github.com/elastic/beats/blob/master/filebeat/filebeat.reference.yml
+
+# Change the "paths" statement if the Qumulo Audit Logs are being written in
+# a different location. See the /etc/rsyslog.d/10-qumulo-audit.conf file in your rsyslog server.
+
+filebeat.inputs:
+- type: log
+  paths:
+    - /var/log/qumulo/*.log*
+
+# Change the "hosts" statement if the port of 10514 is already in use on your network.
+# If you change it here, you MUST also change it in the logstash.conf file
+
+output.logstash:
+  hosts: ["logstash:10514"]
+  codec.format:
+    string: '%{[message]}'

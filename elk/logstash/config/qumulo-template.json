@@ -1,0 +1,106 @@
+{
+    "template": "qumulo-auditlogs",
+    "version": 101,
+    "settings": {
+	"index.refresh_interval": "5s",
+	"number_of_shards": "4",
+	"number_of_replicas": "2"
+    },
+    "mappings" : {
+	"properties" : {
+	    "@timestamp" : {
+		"type" : "date"
+	    },
+	    "clustername" : {
+		"type" : "text",
+		"fields" : {
+		    "keyword" : {
+			"type" : "keyword",
+			"ignore_above" : 64
+		    }
+		}
+	    },
+	    "extension" : {
+		"type" : "text",
+		"fields" : {
+		    "keyword" : {
+			"type" : "keyword",
+			"ignore_above" : 32
+		    }
+		}
+	    },
+	    "fileid" : {
+		"type" : "long"
+	    },
+	    "ipaddress" : {
+		"type" : "ip"
+	    },
+	    "loginid" : {
+		"type" : "text",
+		"fields" : {
+		    "keyword" : {
+			"type" : "keyword",
+			"ignore_above" : 64
+		    }
+		}
+	    },
+	    "nodename" : {
+		"type" : "text",
+		"fields" : {
+		    "keyword" : {
+			"type" : "keyword",
+			"ignore_above" : 32
+		    }
+		}
+	    },
+	    "operation" : {
+		"type" : "text",
+		"fields" : {
+		    "keyword" : {
+			"type" : "keyword",
+			"ignore_above" : 32
+		    }
+		}
+	    },
+	    "primarypath" : {
+		"type" : "text",
+		"fields" : {
+		    "keyword" : {
+			"type" : "keyword",
+			"ignore_above" : 1024
+		    }
+		}
+	    },
+	    "protocol" : {
+		"type" : "text",
+		"fields" : {
+		    "keyword" : {
+			"type" : "keyword",
+			"ignore_above" : 32
+		    }
+		}
+	    },
+	    "secondarypath" : {
+		"type" : "text",
+		"fields" : {
+		    "keyword" : {
+			"type" : "keyword",
+			"ignore_above" : 1024
+		    }
+		}
+	    },
+	    "status" : {
+		"type" : "text",
+		"fields" : {
+		    "keyword" : {
+			"type" : "keyword",
+			"ignore_above" : 32
+		    }
+		}
+	    },
+	    "qumulo-timestamp" : {
+		"type" : "date"
+	    }
+	}
+    }
+}

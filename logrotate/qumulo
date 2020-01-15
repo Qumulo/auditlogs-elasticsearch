@@ -1,0 +1,12 @@
+/var/log/qumulo/*.log {
+        daily
+        missingok
+	notifempty
+        rotate 4
+	size 50M
+	dateext
+	dateformat -%Y-%m-%d
+	postrotate
+	     /usr/lib/rsyslog/rsyslog-rotate
+	endscript
+}

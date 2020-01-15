@@ -1,0 +1,138 @@
+version: "3.7"
+services:
+
+  swarm-listener:
+    image: dockerflow/docker-flow-swarm-listener:latest
+    hostname: swarm-listener
+    networks:
+      - qumulo
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - DF_NOTIFY_CREATE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/reconfigure
+      - DF_NOTIFY_REMOVE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/remove
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  proxy:
+    image: dockerflow/docker-flow-proxy:latest
+    hostname: proxy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "9200:9200"
+    networks:
+      - qumulo
+    environment:
+      - LISTENER_ADDRESS=swarm-listener
+      - MODE=swarm
+      - BIND_PORTS=9200
+    deploy:
+      replicas: 2
+      
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-7.5.0}
+    environment:
+      # https://github.com/docker/swarmkit/issues/1951
+      - node.name={{.Node.Hostname}}
+      - discovery.seed_hosts=elasticsearch
+      - cluster.initial_master_nodes=${INITIAL_MASTER_NODES:-node1}
+      - cluster.name=QumuloLogs
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD:-changeme}
+      - xpack.security.enabled=false
+      - xpack.monitoring.collection.enabled=true
+      - xpack.license.self_generated.type=basic
+      - network.host=0.0.0.0
+      - "ES_JAVA_OPTS=-Xms1G -Xmx1G"
+    networks:
+      - qumulo
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    deploy:
+      mode: 'global'
+      endpoint_mode: dnsrr
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.servicePath=/
+        - com.df.port=9200
+        - com.df.srcPort=9200
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${ELASTIC_VERSION:-7.5.0}
+    hostname: "{{.Node.Hostname}}-logstash"
+    environment:
+      - XPACK_MONITORING_ELASTICSEARCH_URL=http://elasticsearch:9200
+      - XPACK_MONITORING_ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME:-elastic}
+      - XPACK_MONITORING_ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD:-changeme}
+    networks:
+      - qumulo
+    configs:
+      - source: ls_config
+        target: /usr/share/logstash/pipeline/logstash.conf
+      - source: qt_config
+        target: /usr/share/logstash/config/qumulo-template.json
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${ELASTIC_VERSION:-7.5.0}
+    hostname: "{{.Node.Hostname}}-filebeat"
+    environment:
+      - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-node1}
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME:-elastic}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD:-changeme}
+    # Need to override user so we can access the log files, and docker.sock
+    user: root
+    networks:
+      - qumulo
+    configs:
+      - source: fb_config
+        target: /usr/share/filebeat/filebeat.yml
+    volumes:
+      - filebeat:/usr/share/filebeat/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/log/qumulo:/var/log/qumulo:ro
+    # disable strict permission checks
+    command: ["--strict.perms=false"]
+    deploy:
+      placement:
+        constraints: [node.labels.Filebeat == true]
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION:-7.5.0}
+    hostname: "{{.Node.Hostname}}-kibana"
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME:-elastic}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD:-changeme}
+      - SERVER_NAME="{{.Node.Hostname}}-kibana"
+    networks:
+      - qumulo
+    volumes:
+      - kibana:/usr/share/kibana/data
+    deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.servicePath=/
+        - com.df.port=5601
+        - com.df.srcPort=80
+
+networks:
+    qumulo:
+      external: true
+
+volumes:
+  elasticsearch:
+  kibana:
+  filebeat:
+
+configs:
+  ls_config:
+    file: $PWD/elk/logstash/config/pipeline/logstash.conf
+  qt_config:
+    file: $PWD/elk/logstash/config/qumulo-template.json
+  fb_config:
+    file: $PWD/elk/beats/filebeat/config/filebeat.yml
+
+    

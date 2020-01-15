@@ -144,8 +144,8 @@ master node of the Docker Swarm cluster allocated to running Elastic Stack and c
 following these commands:
 
   * `git version`
-  * `git clone https://github.com/Qumulo/qumulo-docker-elasticsearch`
-  * `cd qumulo-docker-elasticsearch`
+  * `git clone https://github.com/Qumulo/auditlogs-elasticsearch`
+  * `cd auditlogs-elasticsearch`
 
 ## Edit Filebeat Config File
 

@@ -97,8 +97,10 @@ implementation, we need to have two prerequisites before we can install the Elas
 
 rsyslog and the Docker Engine run on Linux machines. Those machines could be either virtual or physical.
 
-rsyslog will run on only one of the machines. With Docker, we will create a cluster using the four
-machines; including the machine used for rsyslog. 
+With Docker, we will create a cluster using the four machines. One of the machines that you use for your
+Docker Cluster **MUST** include the machine used for rsyslog. With that said, rsyslog will run **outside**
+of the Docker Cluster environment. This is because we want Qumulo Audit Logs to be captured even if
+the Docker Cluster is shutdown for modification or maintenance.
 
 Elasticsearch is an indexing and searching engine that provides its best performance when it is
 formed within an Elasticsearch cluster. To that end, we recommend that you build a docker cluster to

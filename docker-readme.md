@@ -47,6 +47,17 @@ Another area where there can be synergy between VMs and Docker containers is in 
 
 <img src="./pics/docker-versus-docker-on-vm.png" style="width: 400px;"/>
 
+### VM Map Count for Elasticsearch
+
+Elasticsearch uses a memory mapped directory by default to store its indices. The default for most Linux
+operating systems on mmap counts is likely to be too low, which may result in out of memory exceptions.
+
+So, you will need to set them higher in order for Elasticsearch to run with no errors. The commands
+are:
+
+  * `sudo sysctl -w vm.max_map_count=262144`
+  * `sudo echo 'vm.max_map_count=262144' >> /etc/sysctl.conf` (to persist reboots)
+
 ## Installing Docker on Ubuntu 18.04
 
 We are going to use Ubuntu Server 18.04 LTS as the example for our installation instructions. If your

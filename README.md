@@ -121,17 +121,6 @@ Docker is a tool designed to make it easier to create, deploy, and run applicati
 
 In a VERY small way, Docker is like a virtual machine. However, unlike a virtual machine, Docker allows applications to use the same Linux kernel as the system that Docker is running on and only requires applications be shipped with things not already running on the host computer. This gives a significant performance boot and reduces the size of the application by removing the overhead of loading and managing a complete guest OS.
 
-### VM Map Count for Elasticsearch
-
-Elasticsearch uses a mmaped directory by default to store its indices. The default for most Linux
-operating systems on mmap counts is likely to be too low, which may result in out of memory exceptions.
-
-So, you will need to set them higher in order for Elasticsearch to run with no errors. The commands
-are:
-
-  * `sudo sysctl -w vm.max_map_count=262144`
-  * `sudo echo 'vm.max_map_count=262144' >> /etc/sysctl.conf` (to persist reboots)
-
 ### Configure the Docker Engine to run on your four machines
 
 We have taken the guess work out of getting Docker installed and running on your four virtual or

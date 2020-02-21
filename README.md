@@ -77,6 +77,12 @@ will create a cluster of running applications that use
 * **Elasticsearch** to store and index the audit logs from Logstash
 * **Kibana** to visualize or report on the data from Elasticsearch
 
+## Installation Video
+
+Perhaps you would like to see a working implementation and a **Howto** video on installing this solution? If so, then jump over to **Youtube** and look at: https://youtu.be/8xnUFshNTNw
+
+The video is about 45 minutes long, but walks through the entire implementation from start to finish. It kind of proves the idea that you can install Elasticsearch and be indexing your Qumulo Audit Logs within 45 minutes.
+
 ## Prerequisites
 
 Several things have to happen before we can install the Elastic Stack and get the Qumulo Audit Logs

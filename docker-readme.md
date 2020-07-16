@@ -234,7 +234,7 @@ root@dq2-a-40g:~/kade/qumulo-docker-elasticsearch#
 
 The `--advertise-addr` flag configures the manager node to publish its address as `10.220.246.26`.
 The other nodes in the swarm must be able to access the manager at the IP address. Of course,
-the <MANAGER-IP> for your configuration would be the IP Address of the Ubuntu Server where
+the MANAGER-IP for your configuration would be the IP Address of the Ubuntu Server where
 you just ran the **docker swarm init** command. 
 
 The output includes the command to join new nodes to the swarm. Nodes will join as managers or workers

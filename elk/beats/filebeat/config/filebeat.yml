@@ -15,3 +15,14 @@ output.logstash:
   hosts: ["logstash:10514"]
   codec.format:
     string: '%{[message]}'
+
+logging.metrics.enabled: true
+logging.metrics.period: 60s
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644
+  

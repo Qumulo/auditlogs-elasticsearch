@@ -1,10 +1,15 @@
 {
     "template": "qumulo-auditlogs",
-    "version": 101,
+    "version": 110,
     "settings": {
-	"index.refresh_interval": "5s",
-	"number_of_shards": "4",
-	"number_of_replicas": "2"
+	"index": {
+	    "lifecycle": {
+		"name": "auditlogs-lifecycle"
+	    },
+	    "refresh_interval": "5s",
+	    "number_of_shards": "4",
+	    "number_of_replicas": "2"
+	}
     },
     "mappings" : {
 	"properties" : {

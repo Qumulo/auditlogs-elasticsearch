@@ -3,9 +3,6 @@
     "version": 110,
     "settings": {
 	"index": {
-	    "lifecycle": {
-		"name": "auditlogs-lifecycle"
-	    },
 	    "refresh_interval": "5s",
 	    "number_of_shards": "4",
 	    "number_of_replicas": "2"

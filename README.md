@@ -191,8 +191,8 @@ It is not necessary to change the Logstash configuration file if you are willing
   * `export ELASTICSEARCH_PASSWORD=changeme`
   * `export INITIAL_MASTER_NODES=node1` _(Change the value of "node1" to the name of one of the machines running Docker in your swarm cluster. See Important discovery and cluster formation settings: https://www.elastic.co/guide/en/elasticsearch/reference/current/discovery-settings.html#initial_master_nodes)_
   * `export ELASTICSEARCH_HOST=node1` _(Change the value of "node1" to the name of one of the machines running Docker in your swarm cluster)_
-* Deploy the Elastic Stack by executing the deploy.sh script
-  * `./deploy.sh`
+* Deploy the Elastic Stack by executing the deployStack.sh script
+  * `./deployStack.sh`
 
 At this point, you should have started the Elasticsearch cluster and ELK stack. See! Wasn't that easy! 
 

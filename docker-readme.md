@@ -43,7 +43,7 @@ At the most basic level VMs are a great place for Docker hosts to run. And by VM
 
 Can Docker container-based services interact with VM-based services? Again, the answer is absolutely yes. Running your application in a set of Docker containers doesn’t preclude it from talking to the services running in a VM.
 
-Another area where there can be synergy between VMs and Docker containers is in the area of capacity optimization. VMs gained early popularity because the enabled higher levels of server utilization. That’s still true today. A vSphere host, for instance, can host VMs that may house Docker hosts, but may also host any number of traditional monolithic VMs. By mixing and matching Docker hosts with “traditional” VMs, sysadmins can be assured they are getting the maximum utilization out of their physical hardware.
+Another area where there can be synergy between VMs and Docker containers is in the area of capacity optimization. VMs gained early popularity because the enabled higher levels of server utilization. That’s still true today. A vSphere host, for instance, can host VMs that may house Docker hosts, but may also host any number of traditional monolithic VMs. By mixing and matching Docker hosts with “traditional" VMs, sysadmins can be assured they are getting the maximum utilization out of their physical hardware.
 
 <img src="./pics/docker-versus-docker-on-vm.png" style="width: 400px;"/>
 

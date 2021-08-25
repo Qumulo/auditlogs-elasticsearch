@@ -211,8 +211,8 @@ constant(value=".log")
 template(name="QumuloAuditFormat" type="list") {
 property(name="timestamp" dateFormat="rfc3339")
 constant(value=",")
-property(name=”hostname”)
-constant(value=”,”)
+property(name="hostname")
+constant(value=",")
 property(name="msg")
 constant(value="\n")
 }

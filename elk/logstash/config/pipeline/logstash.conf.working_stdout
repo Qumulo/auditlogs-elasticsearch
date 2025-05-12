@@ -23,13 +23,17 @@ filter {
 # this, the default would be string and that would be hard to search with Elasticsearch
 
     convert => {
-      "fileid" => "integer"
+      "fileid" => "string"
       "qumulo-timestamp" => "date_time"
     }
   }
 
 # Copy the filepath and nodename to their destination variables so that we can
 # modify them through filters a little later.
+
+mutate {
+    convert => { "fileid" => "string" }
+  }
 
   mutate {
     copy => { "filepath" => "primarypath" }

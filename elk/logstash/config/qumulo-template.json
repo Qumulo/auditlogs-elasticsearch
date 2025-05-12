@@ -32,7 +32,7 @@
 		}
 	    },
 	    "fileid" : {
-		"type" : "long"
+		"type" : "text"
 	    },
 	    "ipaddress" : {
 		"type" : "ip"
